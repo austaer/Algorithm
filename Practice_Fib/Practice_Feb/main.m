@@ -10,15 +10,26 @@
 
 @interface LargeNumber : NSObject
 
+/* use array to save the large number */
 @property (nonatomic, strong) NSArray *numericArray;
 
+/* convenience constructor */
 + (LargeNumber*)numberWithInt:(NSInteger)n;
+
 - (instancetype)initWithNumericArray:(NSArray*)numericArray;
+
 - (instancetype)initWithInt:(NSInteger)n;
+
 - (NSUInteger)length;
+
 - (LargeNumber*)add:(LargeNumber*)n;
+
 - (BOOL)isEqualToNumber:(NSInteger)num;
+
+/* convert large number to integer (won't handle number larger than 32 or 64 bits) */
 - (NSInteger)toInteger;
+
+/* return the number located at 'digit' */
 - (NSInteger)numberAtDigit:(NSUInteger)digit;
 
 @end
@@ -108,7 +119,7 @@
 
 @end
 
-
+/* naive implementation with recursive function */
 NSInteger fibRecursive(n){
     if( n == 0 ){
         return 0;
@@ -126,15 +137,16 @@ LargeNumber* fibIteration( LargeNumber* n ){
     }else if ( [n isEqualToNumber:1] ){
         return [LargeNumber numberWithInt:1];
     }
-    
+    /* use array to save the prvious 3 numbers of current number */
+    /* we need only capacity 3, and replace the useless one with the new calculated number */
     NSMutableArray<LargeNumber*> *tempArray = [NSMutableArray arrayWithCapacity:3];
     tempArray[0] = [LargeNumber numberWithInt:0];
     tempArray[1] = [LargeNumber numberWithInt:1];
     
     for (int i=2; i<=[n toInteger]; i++) {
+        /* add previous two number as the third one */
         LargeNumber *sum = [tempArray[(i-1)%3] add:tempArray[(i-2)%3]];
         tempArray[i%3] = sum;
-    
     }
     
     return tempArray[[n toInteger]%3];

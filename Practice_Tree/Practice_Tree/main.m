@@ -49,65 +49,93 @@
 
 @end
 
-Node* createARandomTreeWithLevels(NSInteger n){
-    if( n == 0 ){
-        return nil;
-    }else{
-        
-        Node *root = [Node aNodeWithData:@( arc4random() % 16 )];
-        root.lNode = createARandomTreeWithLevels(n-1);
-        root.rNode = createARandomTreeWithLevels(n-1);
-        
-        return root;
-    }
-}
-
-
 Node *createATreeWithBFSArrayRepresentation(NSArray *treeArray){
     
     Node* root = [Node aNodeWithData:[treeArray[0] copy]];
     
-    for( NSNumber *num in treeArray ){
+    int flag = 0;
+    Node *currentNode;
+    NSMutableArray *queue = [NSMutableArray array];
+    [queue addObject:root];
+    
+    for (int i=1; i<treeArray.count; i++) {
+        int data = [treeArray[i] intValue];
         
+        if( flag == 0 ){
+            currentNode = [queue firstObject];
+            [queue removeObjectAtIndex:0];
+        }
         
+        if( data != 0 ){
+            Node *nodeToBeInsert = [Node aNodeWithData:@(data)];
+            if( flag == 0 ){
+                currentNode.lNode =  nodeToBeInsert;
+            }else{
+                currentNode.rNode =  nodeToBeInsert;
+            }
+            [queue addObject:nodeToBeInsert];
+        }
         
-        
+        if( flag == 0 ){
+            flag = 1;
+        }else{
+            flag = 0;
+        }
+
     }
     
-    if( treeArray.count == 0 ){
-        return nil;
-    }
-    
-    int firstDigit = [[treeArray firstObject] intValue];
-    if( firstDigit == 0 ){
-        return nil;
-    }
-    
-    return nil;
+    return root;
 }
 
-void printTheNodeofTreesInLevel( NSArray *tree, int level ){
-    if( level == 0 ){
-        NSLog(@"%@", [tree firstObject] );
-        return;
-    }
-    int firstIndexOfLevelInArray = pow(2, level)-1;
-    int nextIndexOfLevelInArray = pow(2, level+1);
-    NSLog(@"%@", [tree subarrayWithRange:NSMakeRange(firstIndexOfLevelInArray, nextIndexOfLevelInArray-firstIndexOfLevelInArray-1)] );
-    for (int i=firstIndexOfLevelInArray; i< nextIndexOfLevelInArray; i++ ) {
-        
-    }
+/* use a queue to implement the breadth first search */
+void printTheNodeOfNodeRepresentedTree( Node *tree ){
     
+    NSMutableArray *queue = [NSMutableArray array];
+    
+    /* flag the left node (0) or the right node (1) */
+    int flag = 0;
+    Node *currentNode = tree;
+    
+    [queue addObject:tree];
+    
+    NSLog(@"%@" , tree );
+    
+    while ( queue.count != 0 ) {
+        /* dequeue the parent */
+        if( flag == 0 ){
+            currentNode = [queue firstObject];
+            [queue removeObjectAtIndex:0];
+            
+        }
+    
+        if( flag == 0 ){
+            /* save node for later access */
+            if( currentNode.lNode != nil ){
+                [queue addObject:currentNode.lNode];
+            }
+            flag = 1;
+            NSLog(@"%@", currentNode.lNode );
+            
+        }else{
+            /* save node for later access */
+            if( currentNode.rNode != nil ){
+                [queue addObject:currentNode.rNode];
+            }
+            flag = 0;
+            NSLog(@"%@", currentNode.rNode );
+        }
+    }
 }
 
 int main(int argc, const char * argv[]) {
     @autoreleasepool {
+        /* this is a breadth first representation of a binary tree */
+        NSArray *tree = @[@(2),@(4),@(3),@(1),@(0),@(5),@(8),@(3),@(1), @(0), @(0), @(3), @(9), @(0), @(7)];
         
-        NSArray *tree = @[@(1),@(1),@(0),@(1),@(0),@(1),@(1),@(0),@(1), @(0), @(0), @(1), @(1), @(0), @(1)];
         Node *root = createATreeWithBFSArrayRepresentation(tree);
-        NSLog(@"root %@", root );
-        printTheNodeofTreesInLevel(tree, 3);
-
+        
+        printTheNodeOfNodeRepresentedTree( root );
+        
     }
     return 0;
 }
